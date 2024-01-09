@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamentos Parcelados</title>
+</head>
+<body>
+
+  <!-- Adicione uma imagem com o logotipo no início da página -->
+  <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=392,fit=crop,q=95/A852GK04R0TLRWgZ/logos-viagens-inteligentes-640-x-240-px-ALpBEoKlkyUeqEME.png" alt="Logotipo" style="width: 50%; max-width: 200px;  margin: 20px auto; display: block;">
+
+  <div style="text-align:center"></div>
+    <h2>Simulador de Parlamentos</h2>  
+  </div>
+
+  <script>
+    function obterParametroDaUrl(nome) {
+      const parametros = new URLSearchParams(window.location.search);
+      return parametros.get(nome);
+    }
+
+    function calcularParcelas() {
+      const valor = parseFloat(obterParametroDaUrl('valor').replace(',', '.'));
+      const taxaJurosMensal = 3.9 / 100;
+
+      const numeroParcelas = 10;
+
+      const tabelaParcelas = document.createElement('table');
+      tabelaParcelas.style.width = '30%';
+      tabelaParcelas.style.borderCollapse = 'collapse';
+      tabelaParcelas.style.marginTop = '2px';
+      tabelaParcelas.style.border = '2px solid black';
+
+      const thead = tabelaParcelas.createTHead();
+      const headerRow = thead.insertRow();
+
+      const headers = ['Parcela', 'Valor da Parcela', 'Valor Total'];
+
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.appendChild(document.createTextNode(headerText));
+        th.style.border = '1px solid black';
+        th.style.padding = '4px';
+        th.style.textAlign = 'right';
+        headerRow.appendChild(th);
+      });
+
+      const tbody = document.createElement('tbody');
+      tabelaParcelas.appendChild(tbody);
+
+      for (let parcela = 1; parcela <= numeroParcelas; parcela++) {
+        const jurosMensal = taxaJurosMensal;
+        let saldoDevedor = valor;
+        let valorTotal = 0;
+
+        for (let i = 1; i <= parcela; i++) {
+          const valorParcela = (valor * jurosMensal) / (1 - Math.pow(1 + jurosMensal, -parcela));
+          const juros = saldoDevedor * jurosMensal;
+          const amortizacao = valorParcela - juros;
+          saldoDevedor -= amortizacao;
+          valorTotal += valorParcela;
+
+          if (i === parcela) {
+            const newRow = tbody.insertRow();
+            const cellParcela = newRow.insertCell(0);
+            const cellValorParcela = newRow.insertCell(1);
+            const cellValorTotal = newRow.insertCell(2);
+
+            cellParcela.textContent = parcela;
+            cellValorParcela.textContent = valorParcela.toFixed(2).replace('.', ',');
+            cellValorTotal.textContent = valorTotal.toFixed(2).replace('.', ',');
+
+            [cellParcela, cellValorParcela, cellValorTotal].forEach(cell => {
+              cell.style.border = '1px solid black';
+              cell.style.padding = '4px';
+              cell.style.textAlign = 'right';
+            });
+          }
+        }
+      }
+
+      document.body.appendChild(tabelaParcelas);
+    }
+
+    // Chama a função ao carregar a página
+    calcularParcelas();
+  </script>
+
+</body>
+</html>
